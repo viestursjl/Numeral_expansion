@@ -1,0 +1,6 @@
+/thrax
+/target/*
+.idea
+untitled.iml
+part.txt
+/resources/api_key.txt
