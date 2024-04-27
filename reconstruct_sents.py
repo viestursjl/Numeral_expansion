@@ -1,63 +1,70 @@
-import numpy as np
-from sklearn.model_selection import train_test_split
+# Pynini library setup required Linux or Linux subsystem
+
 import json
 import pynini
-
-FILE = "D:\\Uni\\Magistrs\\_MAGISTRA_DARBS\\LVK2022\\LVK2022_analiize\\resources\\full.txt"
-dataset = []
+from pynini.lib.rewrite import top_rewrite
 
 
 def get_fst(far_path):
     return pynini.Far(far_path).get_fst()
 
-fst_exp: pynini.Fst = get_fst("expand.far")
+fst_col: pynini.Fst = get_fst("resources/collapse.far")
 
 
 def shorten(text):
-    print("Call Pynini here!")
-    return text
+    try:
+        short = top_rewrite(text, fst_col)
+    except Exception as error:
+        print("Could not process the following sentnece:")
+        print(text + "\n")
+        return False
+    if short:
+        short = short.replace("\\[", "[").replace("\\]", "]")
+    return short
 
 
 def process_sent(sentence):
     full_text = ""
-    for token in sentence:
-        full_text += ["text"]+" "
+    sent_data = json.loads(sentence)
+    for token in sent_data:
+        token_text = token["text"].replace("[", "\\[").replace("]", "\\]")
+        full_text += +" "
     full_text = full_text.strip()
     short_text = shorten(full_text)
-    dataset.append([short_text, full_text])
+    if short_text:
+        return [short_text, full_text]
+    return
 
 
-def process_doc(doc):
-    global int_id
-    print(int_id)
-    int_id += 1
-    for sent in doc:
-        process_sent(sent)
+# This function writes the split dataset sentences as a formatted file
+def write_file(data, file):
+    out = open(file, 'w', encoding="utf-8")
+    for sent in data:
+        text = json.dumps(sent, ensure_ascii=False)
+        out.write(text+"\n")
+    out.close()
 
 
-def process_file(ofile):
-    f = open(ofile, "r", encoding="utf-8")
+def read_dataset(file):
+    ofile = file.split("/")[0]+"/merged/"+file.split("/")[1]
+    sentences = []
+    f = open(file, 'r', encoding="utf-8")
     line = f.readline()
-    doc_data = ""
     while True:
         if not line:
             break
-        if line == "][\n":
-            doc_data += "]"
-            data = json.loads(doc_data)
-            process_doc(data)
-            doc_data = "[\n"
-        else:
-            doc_data += line
+        sent_set = process_sent(line)
+        if sent_set:
+            sentences.append()
         line = f.readline()
-    if doc_data:
-        data = json.loads(doc_data)
-        process_doc(data)
-    print("Processing complete!")
+    write_file(sentences, ofile)
+    print("Finished processing {}".format(file))
 
 
 def main():
-    process_file(FILE)
+    read_dataset("datasets/test.txt")
+    read_dataset("datasets/valid.txt")
+    read_dataset("datasets/train.txt")
 
 
 main()

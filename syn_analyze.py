@@ -11,7 +11,7 @@ int_id = 0
 
 def to_csv(info, outfile):
     with open("target/"+outfile, 'w', encoding="utf-8", newline='') as f:
-        k = dict(sorted(info.items(), key=lambda item: item[1]))
+        k = dict(sorted(info.items(), key=lambda item: -item[1]))
         w = csv.writer(f)
         w.writerows(k.items())
     print("File created!")

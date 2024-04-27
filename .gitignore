@@ -1,5 +1,6 @@
 /thrax
-/target/*
+/target
+/datasets
 .idea
 untitled.iml
 part.txt
