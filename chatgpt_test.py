@@ -4,10 +4,10 @@ from openai import OpenAI
 def get_key(file):
     f = open(file, "r", encoding="utf-8")
     key = f.readlines()
-    return key
+    return key[0]
 
 
-CLIENT = OpenAI(get_key("resources/api_key.txt"))
+CLIENT = OpenAI(api_key=get_key("resources/api_key.txt"))
 
 
 def gpt_expand(sentence):
