@@ -24,7 +24,7 @@ STATS_FILE = "target/stats.csv"
 
 
 def load_stats(num_type, head):
-    relevant = []
+    # relevant = []
 
     f = open(STATS_FILE, "r", encoding="utf-8")
     line = f.readline()
@@ -39,29 +39,27 @@ def load_stats(num_type, head):
             if "Case=" in target_tok and "Gender=" in target_tok:
                 case = target_tok.split("Case=")[1][:3]
                 gender = target_tok.split("Gender=")[1][:3]
-                final = (case + gender).upper()
+                final = "+"+(case + gender).upper()
                 print(final)
                 return final
         line = f.readline()
-    return "NOMMAS"
+    return "+NOMMAS"
 
 
 def fixed_stat_method(token, sentence):
-    if "feats" in sentence[token]:
-        num_type = sentence[token]["feats"]
+    if "feats" in sentence.to_dict()[0][token]:
+        tok = sentence.to_dict()[0][token]
+        num_type = tok["feats"]
         head = "_"
-        head_id = int(sentence[token]["head"])-1
+        head_id = int(tok["head"])-1
         if head_id >= 0:
-            head_tok =  sentence[head_id]
+            head_tok = sentence.to_dict()[0][head_id]
             if "feats" in head_tok:
                 head = head_tok["feats"]
             else:
                 head = "_"
-        load_stats(num_type, head)
-
-
-def find_decl(token, sentence):
-    print("ŌwŌ")
+        decl = load_stats(num_type, head)
+        return decl
 
 
 def stanza_decline(sentence, phase1):
@@ -70,9 +68,9 @@ def stanza_decline(sentence, phase1):
 
     for x in range(len(phase1)):
         if phase1[x].startswith("{{{"):
-            sentence[x]
-            find_decl(x, sentence)
-    return sentence
+            decl = fixed_stat_method(x, sentence)
+            phase1[x] = phase1[x].replace("+DECL", decl).strip("{{{").strip("}}}")
+    return " ".join(phase1)
 
 
 def exp_tokens(part_exp):
@@ -113,4 +111,6 @@ def syn_expand(sentence):
     return
 
 # syn_expand(text)
-load_stats("NumType=Card", "Case=Acc|Gender=Masc|Number=Plur")
+# load_stats("NumType=Card", "Case=Acc|Gender=Masc|Number=Plur")
+a = stanza_decline("25 pelmeņus", ["{{{divdesmit piec+DECL}}}", "pelmeņus"])
+print(a)
