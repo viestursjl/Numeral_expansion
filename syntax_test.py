@@ -3,24 +3,16 @@
 import json
 import stanza
 from ast import literal_eval
-
-# import pynini
-# from pynini.lib.rewrite import top_rewrite
-#
-#
-# def get_fst(far_path):
-#     return pynini.Far(far_path).get_fst()
-#
-# fst_exp: pynini.Fst = get_fst("resources/expand.far")
+import pynini
+from pynini.lib.rewrite import top_rewrite
 
 
-text = "Sagaidāms, ka ASV Senāts jau otrdien apstiprinās lielu palīdzības paketi Ukrainai un citiem Savienoto Valstu sabiedrotajiem 95 miljardu dolāru apjomā, arī 61 miljarda dolāru vērtu palīdzību Ukrainai."
-text1 = "... 95 miljardu apmērā ..."
-text1 = "... {{{deviņdesmit piec+UNK}}} miljardu apmērā ..."
-text1 = "... 95+GENMAS miljardu apmērā ..."
-text1 = "... deviņdesmit piecu miljardu apmērā ..."
+def get_fst(far_path):
+    return pynini.Far(far_path).get_fst()
 
-text2 = "Līdz 2024. gada 20. maijam"
+fst_exp: pynini.Fst = get_fst("resources/expand.far")
+
+
 STATS_FILE = "target/stats.csv"
 
 
@@ -110,7 +102,5 @@ def syn_expand(sentence):
     return
 
 
-# syn_expand(text)
-# load_stats("NumType=Card", "Case=Acc|Gender=Masc|Number=Plur")
-a = stanza_decline("25 pelmeņus", ["{{{divdesmit piec+DECL}}}", "pelmeņus"])
-print(a)
+piemērs = "Līdz 2024. gada 20. maijam novērojams 23,5 procentu pieaugums"
+print(syn_expand(piemērs))
