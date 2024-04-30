@@ -3,14 +3,25 @@ import json
 
 # IZVĒRŠANAS METODES
 from chatgpt_test import gpt_expand
-
+from syntax_test import syn_stat_expand
+from syntax_test import syn_ml_expand
 
 TEST_SET = "datasets/merged/example.txt"
 mistakes = []
 
 
-def output_mistakes():
-    print("TODO: output mistakes")
+def output_mistakes(info):
+    o = open("target/syn_mistakes.txt", "w", encoding="utf-8")
+    o.truncate(0)
+    o.write(info+"\n")
+    print(mistakes)
+    if mistakes:
+        for sent in mistakes:
+            if sent:
+                print(sent)
+                o.write(sent[0]+"\n")
+                o.write(sent[1]+"\n\n")
+    o.close()
 
 
 def evaluate(method):
@@ -33,7 +44,9 @@ def evaluate(method):
             print(sent_data[1])
 
     score = correct/total * 100
-    print("Method accuracy on numeral expansion: {}% ({}/{})".format(score, correct, total))
+    info = "Method accuracy on numeral expansion: {}% ({}/{})".format(score, correct, total)
+    output_mistakes(info)
+    print(info)
 
 
-evaluate(gpt_expand)
+evaluate(syn_stat_expand)
