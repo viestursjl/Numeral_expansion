@@ -47,6 +47,10 @@ def load_stats(num_type, head):
 :param sentence = teikums stanza formātā
 """
 def fixed_stat_method(token, sentence):
+    if len(sentence.to_dict()[0]) < token:
+        # FIXME: Šis ir brutāls ielāps, gadījumam, ja Stanza parsētājs nepareizi nosaka tokenu skaitu.
+        print("Parsing error!")
+        return "+NOMMAS"
     tok = sentence.to_dict()[0][token]
     num_type = ""
     if "feats" in sentence.to_dict()[0][token]:
