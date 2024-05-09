@@ -68,6 +68,35 @@ def fixed_stat_method(token, sentence):
     return decl
 
 
+def static_method(token, sentence):
+    if len(sentence.to_dict()[0]) < token:
+        # FIXME: Šis ir brutāls ielāps, gadījumam, ja Stanza parsētājs nepareizi nosaka tokenu skaitu.
+        print("Parsing error!")
+        return "+NOMMAS"
+    tok = sentence.to_dict()[0][token]
+
+    case = ""
+    gender = ""
+
+    head_id = int(tok["head"]) - 1
+    if head_id >= 0:
+        head_tok = sentence.to_dict()[0][head_id]
+        if "feats" in head_tok:
+            head = head_tok["feats"]
+            if "Case=" in head:
+                case = head.split("Case=")[1][:3]
+            else:
+                case = "NOM"
+            if "Gender=" in head:
+                gender = head.split("Gender=")[1][:3]
+            else:
+                gender = "MAS"
+        else:
+            case = "NOM"
+            gender = "MAS"
+    final = "+" + (case + gender).upper()
+    return final
+
 # ================================================================
 # Machine learning based approach to declension choice
 
@@ -128,6 +157,15 @@ def exp_tokens(part_expanded):
 
 
 def syn_expand(sentence, method):
+    # Tokenizēšana nepieciešama, ja teksts jau nav satokenizēts.
+    tokener = stanza.Pipeline(lang='lv', processors='tokenize')
+    doc = tokener(sentence)
+    toki = ""
+    for s in doc.sentences:
+        for t in s.tokens:
+            toki += t.text + " "
+    sentence = toki.strip()
+
     sent = sentence.replace("[", "\\[").replace("]", "\\]")
     phase1 = top_rewrite(sent, fst_exp)
     phase1 = phase1.replace("\\[", "[").replace("\\]", "]")
@@ -151,4 +189,4 @@ def syn_ml_expand(sentence):
 
 
 piemērs = "Līdz 2024. gada 20. maijam novērojams 23,5 procentu pieaugums"
-print(syn_expand(piemērs, fixed_stat_method))
+print(syn_expand(piemērs, static_method))
